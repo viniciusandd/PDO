@@ -47,53 +47,33 @@ class Conditional implements QueryInterface
         return $values;
     }
 
-    protected function getPlaceholder($value): string
-    {
-        $placeholder = '?';
-        if ($value instanceof QueryInterface) {
-            $placeholder = "{$value}";
-        }
-
-        return $placeholder;
-    }
-
     /**
      * @return string
      */
     public function __toString(): string
     {
-        $values = $this->getValues();
-
-        $sql = "{$this->column} {$this->operator} ";
+        $sql = "{$this->column} {$this->operator}";
         switch ($this->operator) {
             case 'BETWEEN':
             case 'NOT BETWEEN':
-                if (count($values) != 2) {
+                if (count($this->getValues()) != 2) {
                     trigger_error('Conditional operator "BETWEEN" requires two arguments', E_USER_ERROR);
                 }
 
-                $sql .= '(? AND ?)';
+                $sql .= ' (? AND ?)';
                 break;
 
             case 'IN':
             case 'NOT IN':
-                if (count($values) < 1) {
+                if (count($this->getValues()) < 1) {
                     trigger_error('Conditional operator "IN" requires at least one argument', E_USER_ERROR);
                 }
 
-                $placeholders = '';
-                foreach ($values as $value) {
-                    if (!empty($placeholders)) {
-                        $placeholders .= ', ';
-                    }
-
-                    $placeholders .= $this->getPlaceholder($value);
-                }
-                $sql .= "({$placeholders})";
+                $sql .= ' (' . substr(str_repeat('?, ', count($this->getValues())), 0, -2) . ')';
                 break;
 
             default:
-                $sql .= $this->getPlaceholder($values);
+                $sql .= ' ?';
         }
 
         return $sql;
