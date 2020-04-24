@@ -47,4 +47,23 @@ abstract class AbstractStatement implements QueryInterface
 
         return $stmt;
     }
+
+    protected function getIdInGeneratorFirebird($generator) {
+        $sql = 'SELECT GEN_ID('.$generator.', 0) FROM RDB$DATABASE';
+        $stmt = $this->dbh->query($sql);
+        try {
+            $success = $stmt->execute();
+            if (!$success) {
+                list($state, $code, $message) = $stmt->errorInfo();
+
+                // We are not in exception mode, raise error.
+                trigger_error("SQLSTATE[{$state}] [{$code}] {$message}", E_USER_ERROR);
+            }
+        } catch (PDOException $e) {
+            // We are in exception mode, carry on.
+            throw $e;
+        }
+
+        return $stmt;
+    }
 }

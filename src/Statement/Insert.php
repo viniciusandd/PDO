@@ -227,10 +227,16 @@ class Insert extends AbstractStatement
     /**
      * @return int|string
      */
-    public function execute()
+    public function execute($generator = null)
     {
-        parent::execute();
+        $driver = $this->dbh->getAttribute(PDO::ATTR_DRIVER_NAME);
 
-        return $this->dbh->lastInsertId();
+        if ($driver == 'firebird' && empty($generator))
+            return false;
+
+        parent::execute();
+        
+        return $driver == 'firebird' ? parent::getIdInGeneratorFirebird($generator)->fetch()['GEN_ID'] : 
+            $this->dbh->lastInsertId();
     }
 }

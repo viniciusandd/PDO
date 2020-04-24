@@ -63,7 +63,7 @@ abstract class AdvancedStatement extends AbstractStatement
      *
      * @return $this
      */
-    public function limit(?Clause\Limit $limit)
+    public function limit(Clause\Limit $limit)
     {
         $this->limit = $limit;
 
