@@ -139,6 +139,10 @@ class Select extends AdvancedStatement
     public function getValues(): array
     {
         $values = [];
+        if ($this->limit != null) {
+            $values = array_merge($values, $this->limit->getValues());
+        }
+
         foreach ($this->join as $join) {
             $values = array_merge($values, $join->getValues());
         }
@@ -149,10 +153,6 @@ class Select extends AdvancedStatement
 
         if ($this->having != null) {
             $values = array_merge($values, $this->having->getValues());
-        }
-
-        if ($this->limit != null) {
-            $values = array_merge($values, $this->limit->getValues());
         }
 
         return $values;
@@ -195,6 +195,11 @@ class Select extends AdvancedStatement
         }
 
         $sql = 'SELECT';
+
+        if ($this->limit !== null) {
+            $sql .= " {$this->limit}";
+        }        
+
         if ($this->distinct) {
             $sql .= ' DISTINCT';
         }
@@ -241,10 +246,6 @@ class Select extends AdvancedStatement
                 $sql .= "{$column} {$direction}, ";
             }
             $sql = substr($sql, 0, -2);
-        }
-
-        if ($this->limit !== null) {
-            $sql .= " {$this->limit}";
         }
 
         if (!empty($this->union)) {

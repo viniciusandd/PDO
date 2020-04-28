@@ -11,20 +11,20 @@ use FaaPz\PDO\QueryInterface;
 
 class Limit implements QueryInterface
 {
-    /** @var int $size */
-    protected $size;
+    /** @var int $first */
+    protected $first;
 
-    /** @var int|null $offset */
-    protected $offset;
+    /** @var int|null $skip */
+    protected $skip;
 
     /**
-     * @param int      $size
-     * @param int|null $offset
+     * @param int      $first
+     * @param int|null $skip
      */
-    public function __construct(int $size, ?int $offset = null)
+    public function __construct(int $first, int $skip = null)
     {
-        $this->size = $size;
-        $this->offset = $offset;
+        $this->first = $first;
+        $this->skip = $skip;
     }
 
     /**
@@ -32,10 +32,10 @@ class Limit implements QueryInterface
      */
     public function getValues(): array
     {
-        if ($this->offset !== null) {
-            $values = [$this->offset, $this->size];
+        if ($this->skip !== null) {
+            $values = [$this->first, $this->skip];
         } else {
-            $values = [$this->size];
+            $values = [$this->first];
         }
 
         return $values;
@@ -46,9 +46,9 @@ class Limit implements QueryInterface
      */
     public function __toString(): string
     {
-        $sql = 'LIMIT ?';
-        if ($this->offset !== null) {
-            $sql .= ', ?';
+        $sql = 'FIRST ?';
+        if ($this->skip !== null) {
+            $sql .= ' SKIP ?';
         }
 
         return $sql;
