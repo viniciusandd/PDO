@@ -21,7 +21,7 @@ class Limit implements QueryInterface
      * @param int      $first
      * @param int|null $skip
      */
-    public function __construct(int $first, int $skip = null)
+    public function __construct(int $first = null, int $skip = 0)
     {
         $this->first = $first;
         $this->skip = $skip;
@@ -32,10 +32,10 @@ class Limit implements QueryInterface
      */
     public function getValues(): array
     {
-        if ($this->skip !== null) {
+        if ($this->first !== null) {
             $values = [$this->first, $this->skip];
         } else {
-            $values = [$this->first];
+            $values = [$this->skip];
         }
 
         return $values;
@@ -46,9 +46,9 @@ class Limit implements QueryInterface
      */
     public function __toString(): string
     {
-        $sql = 'FIRST ?';
-        if ($this->skip !== null) {
-            $sql .= ' SKIP ?';
+        $sql = 'SKIP ?';
+        if ($this->first !== null) {
+            $sql = 'FIRST ? SKIP ?';
         }
 
         return $sql;
